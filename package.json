@@ -1,0 +1,34 @@
+{
+  "name": "ip-privacy-checker",
+  "version": "1.0.0",
+  "description": "A web application to check IP address privacy and security information",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server-simple.js",
+    "dev": "nodemon src/server-simple.js",
+    "build": "echo 'No build step required for this project'"
+  },
+  "keywords": [
+    "ip",
+    "privacy",
+    "security",
+    "geolocation",
+    "vpn",
+    "proxy"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+} 
