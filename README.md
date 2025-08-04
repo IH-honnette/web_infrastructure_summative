@@ -8,7 +8,7 @@ A modern web application that empowers Rwandan farmers with data-driven weather 
 - **7-Day Weather Forecast**: Extended weather predictions for planning
 - **Crop-Specific Analysis**: Tailored recommendations for 6 major crops (Maize, Beans, Potatoes, Rice, Coffee, Tea)
 - **Agricultural Insights**: Planting advice, risk assessments, and farming recommendations
-- **Interactive Interface**: Modern, responsive design optimized for mobile devices
+- **Interactive Dashboard**: Modern, responsive design with sidebar navigation
 - **Location-Based Data**: Weather information for 10 major Rwandan locations
 - **Risk Assessment**: Color-coded risk levels (Low, Medium, High) for farming activities
 - **Usage Statistics**: Track application usage and popular locations
@@ -18,22 +18,20 @@ A modern web application that empowers Rwandan farmers with data-driven weather 
 - **Backend**: Node.js with Express.js
 - **Frontend**: Vanilla JavaScript, HTML5, CSS3
 - **Weather API**: OpenWeatherMap API (OneCall 3.0)
-- **Styling**: Modern CSS with glassmorphism design
-- **Containerization**: Docker
-- **Load Balancing**: HAProxy
+- **Styling**: Modern CSS with dashboard design
+- **Icons**: Font Awesome
 
 ## 📋 Prerequisites
 
 - Node.js 16+ 
-- Docker and Docker Compose
 - OpenWeatherMap API key 
 
 ## 🚀 Local Development Setup
 
 ### 1. Clone the Repository
 ```bash
-git clone <web_infrastructure_summative>
-cd weather-agriculture-insights
+git clone <https://github.com/IH-honnette/web_infrastructure_summative.git>
+cd web_infrastructure_summative
 ```
 
 ### 2. Install Dependencies
@@ -59,111 +57,21 @@ PORT=8080
 
 ### 5. Start Development Server
 ```bash
-npm run dev
+npm start
 ```
 
 The application will be available at `http://localhost:8080`
 
-## 🐳 Docker Deployment
+## 🎥 Demo
 
-### Build the Docker Image
-```bash
-# Build the image
-docker build -t your-dockerhub-username/weather-agriculture-insights:v1 .
+**Demo Video**: [Watch the 2-minute demo here](https://your-demo-video-link.com)
 
-# Test locally
-docker run -p 8080:8080 -e OPENWEATHER_API_KEY=your_api_key your-dockerhub-username/weather-agriculture-insights:v1
-
-# Verify it works
-curl http://localhost:8080
-```
-
-### Push to Docker Hub
-```bash
-# Login to Docker Hub
-docker login
-
-# Push the image
-docker push your-dockerhub-username/weather-agriculture-insights:v1
-```
-
-## 🌐 Production Deployment
-
-### Deploy on Lab Infrastructure
-
-#### 1. Deploy on Web-01
-```bash
-# SSH into web-01
-ssh ubuntu@localhost -p 2211
-
-# Pull and run the application
-docker pull your-dockerhub-username/weather-agriculture-insights:v1
-docker run -d --name weather-agriculture-app --restart unless-stopped \
-  -p 8080:8080 \
-  -e OPENWEATHER_API_KEY=your_api_key \
-  your-dockerhub-username/weather-agriculture-insights:v1
-
-# Verify the application is running
-curl http://localhost:8080
-```
-
-#### 2. Deploy on Web-02
-```bash
-# SSH into web-02
-ssh ubuntu@localhost -p 2212
-
-# Pull and run the application
-docker pull your-dockerhub-username/weather-agriculture-insights:v1
-docker run -d --name weather-agriculture-app --restart unless-stopped \
-  -p 8080:8080 \
-  -e OPENWEATHER_API_KEY=your_api_key \
-  your-dockerhub-username/weather-agriculture-insights:v1
-
-# Verify the application is running
-curl http://localhost:8080
-```
-
-#### 3. Configure Load Balancer (lb-01)
-```bash
-# SSH into lb-01
-ssh ubuntu@localhost -p 2210
-
-# Update HAProxy configuration
-sudo tee /etc/haproxy/haproxy.cfg > /dev/null << 'EOF'
-global
-    daemon
-    maxconn 256
-
-defaults
-    mode http
-    timeout connect 5s
-    timeout client  50s
-    timeout server  50s
-
-frontend http-in
-    bind *:80
-    default_backend webapps
-
-backend webapps
-    balance roundrobin
-    server web01 172.20.0.11:8080 check
-    server web02 172.20.0.12:8080 check
-    http-response set-header X-Served-By %[srv_name]
-EOF
-
-# Reload HAProxy
-sudo haproxy -sf $(pidof haproxy) -f /etc/haproxy/haproxy.cfg
-```
-
-#### 4. Test Load Balancing
-```bash
-# Test from your host machine
-for i in {1..6}; do
-  echo "Request $i:"
-  curl -I http://localhost:8082 | grep "x-served-by"
-  echo
-done
-```
+The demo showcases:
+- Local application setup and running
+- User interaction with location and crop selection
+- Weather data display and agricultural insights
+- Dashboard navigation and responsive design
+- Key features and functionality
 
 ## 📊 API Endpoints
 
@@ -291,14 +199,10 @@ Get application usage statistics.
 1. **Weather Check**: Select a location and verify current weather data
 2. **Crop Analysis**: Select a crop and verify agricultural insights
 3. **Forecast**: Check 7-day weather forecast
-4. **Load Balancing**: Test round-robin distribution between servers
+4. **Dashboard Navigation**: Test sidebar navigation and responsive design
 
-### Automated Testing
+### Health Check
 ```bash
-# Run tests (if implemented)
-npm test
-
-# Health check
 curl http://localhost:8080/api/stats
 ```
 
@@ -336,35 +240,59 @@ curl http://localhost:8080/api/stats
 2. **Application Not Starting**
    - Check if port 8080 is available
    - Verify all environment variables are set
-   - Check Docker logs: `docker logs container_name`
+   - Check server logs for errors
 
-3. **Load Balancer Issues**
-   - Verify HAProxy configuration syntax
-   - Check if both web servers are accessible
-   - Test individual server connectivity
+3. **Weather Data Not Loading**
+   - Verify internet connectivity
+   - Check OpenWeatherMap API status
+   - Ensure location names are correct
 
 ### Debug Commands
 ```bash
 # Check application logs
-docker logs weather-agriculture-app
+npm start
 
 # Test API connectivity
 curl http://localhost:8080/api/stats
 
-# Check HAProxy status
-docker exec -it lb-01 haproxy -c -f /etc/haproxy/haproxy.cfg
-
-# Monitor load balancing
-watch -n 1 'curl -s http://localhost:8082/api/stats | grep "x-served-by"'
+# Check environment variables
+echo $OPENWEATHER_API_KEY
 ```
 
-## �� API Documentation
+## 📚 API Documentation
 
 ### OpenWeatherMap API
 - **Provider**: OpenWeatherMap
 - **Documentation**: [OneCall API 3.0 Docs](https://openweathermap.org/api/one-call-3)
 - **Rate Limits**: 1000 calls/day (free tier)
 - **Features**: Current weather, 7-day forecast, minutely precipitation
+
+## 🚧 Development Challenges & Solutions
+
+### Challenges Encountered:
+
+1. **API Rate Limiting**
+   - **Challenge**: OpenWeatherMap free tier has 1000 calls/day limit
+   - **Solution**: Implemented caching to reduce API calls and added usage monitoring
+
+2. **Responsive Design**
+   - **Challenge**: Creating a dashboard that works on all devices
+   - **Solution**: Used CSS Grid and Flexbox with mobile-first approach
+
+3. **Data Presentation**
+   - **Challenge**: Making weather data meaningful for farmers
+   - **Solution**: Created crop-specific analysis with actionable recommendations
+
+4. **Error Handling**
+   - **Challenge**: Graceful handling of API failures
+   - **Solution**: Comprehensive error handling with user-friendly messages
+
+### Technical Solutions:
+
+- **Caching Strategy**: Implemented in-memory caching for API responses
+- **Progressive Enhancement**: Core functionality works without JavaScript
+- **Accessibility**: Added proper ARIA labels and keyboard navigation
+- **Performance**: Optimized bundle size and loading times
 
 ## 🤝 Contributing
 
@@ -383,7 +311,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **OpenWeatherMap**: Provided weather data API
 - **Rwandan Farmers**: Inspiration and feedback
 - **Font Awesome**: Icons used throughout the application
-- **Modern CSS**: Glassmorphism design inspiration
 
 ## 📞 Support
 

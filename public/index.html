@@ -10,19 +10,58 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
                     <i class="fas fa-seedling"></i>
-                    <h1>Weather & Agriculture Insights</h1>
+                    <h2>Farm Insights</h2>
                 </div>
-                <p class="subtitle">Empowering Rwandan Farmers with Data-Driven Decisions</p>
+                <p class="sidebar-subtitle">Empowering Rwandan Farmers with Data-Driven Decisions</p>
             </div>
-        </header>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+            </nav>
+        </aside>
 
-        <!-- Main Content -->
+        <!-- Main Content Area -->
         <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-content">
+                    <div class="logo">
+                        <i class="fas fa-seedling"></i>
+                        <h1>Weather & Agriculture Insights</h1>
+                    </div>
+                    <p class="subtitle">Empowering Rwandan Farmers with Data-Driven Decisions</p>
+                </div>
+            </header>
+
+            <!-- Statistics Section -->
+            <section class="stats-section">
+                <div class="stats-container">
+                    <h2><i class="fas fa-chart-bar"></i> Usage Statistics</h2>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="totalSearches">0</div>
+                            <div class="stat-label">Total Searches</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="uniqueLocations">0</div>
+                            <div class="stat-label">Locations Checked</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="recentSearches">0</div>
+                            <div class="stat-label">Recent Searches</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Search Section -->
             <section class="search-section">
                 <div class="search-container">
@@ -70,75 +109,78 @@
 
             <!-- Results Section -->
             <div id="results" class="results-section hidden">
-                <!-- Weekly Weather Averages Card -->
+                <!-- Combined Weather Averages Card -->
                 <div class="weather-card">
                     <div class="card-header">
-                        <h2><i class="fas fa-calendar-week"></i> Weekly Weather Averages</h2>
+                        <h2><i class="fas fa-thermometer-half"></i> Weather Averages</h2>
                         <span id="locationName" class="location-name"></span>
                     </div>
-                    <div class="weather-content">
-                        <div class="weather-main">
-                            <div class="temperature">
-                                <span id="weeklyTemp" class="temp-value"></span>
-                                <span class="temp-unit">°C</span>
-                            </div>
-                            <div class="weather-description">
-                                <span id="weeklyWeatherDesc">Weekly Average</span>
+                    <div class="weather-averages-grid">
+                        <!-- Weekly Weather -->
+                        <div class="weather-period">
+                            <h3><i class="fas fa-calendar-week"></i> Weekly Averages</h3>
+                            <div class="weather-content">
+                                <div class="weather-main">
+                                    <div class="temperature">
+                                        <span id="weeklyTemp" class="temp-value"></span>
+                                        <span class="temp-unit">°C</span>
+                                    </div>
+                                    <div class="weather-description">
+                                        <span id="weeklyWeatherDesc">Weekly Average</span>
+                                    </div>
+                                </div>
+                                <div class="weather-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-thermometer-half"></i>
+                                        <span>Min: <span id="weeklyMin"></span>°C | Max: <span id="weeklyMax"></span>°C</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-tint"></i>
+                                        <span>Humidity: <span id="weeklyHumidity"></span>%</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-wind"></i>
+                                        <span>Wind: <span id="weeklyWind"></span> m/s</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-cloud-rain"></i>
+                                        <span>Precipitation: <span id="weeklyPrecip"></span>%</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="weather-details">
-                            <div class="detail-item">
-                                <i class="fas fa-thermometer-half"></i>
-                                <span>Min: <span id="weeklyMin"></span>°C | Max: <span id="weeklyMax"></span>°C</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-tint"></i>
-                                <span>Humidity: <span id="weeklyHumidity"></span>%</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-wind"></i>
-                                <span>Wind: <span id="weeklyWind"></span> m/s</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-cloud-rain"></i>
-                                <span>Precipitation: <span id="weeklyPrecip"></span>%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Monthly Weather Averages Card -->
-                <div class="weather-card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-calendar-alt"></i> Monthly Weather Averages</h2>
-                        <span id="locationName2" class="location-name"></span>
-                    </div>
-                    <div class="weather-content">
-                        <div class="weather-main">
-                            <div class="temperature">
-                                <span id="monthlyTemp" class="temp-value"></span>
-                                <span class="temp-unit">°C</span>
-                            </div>
-                            <div class="weather-description">
-                                <span id="monthlyWeatherDesc">Monthly Average</span>
-                            </div>
-                        </div>
-                        <div class="weather-details">
-                            <div class="detail-item">
-                                <i class="fas fa-thermometer-half"></i>
-                                <span>Min: <span id="monthlyMin"></span>°C | Max: <span id="monthlyMax"></span>°C</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-tint"></i>
-                                <span>Humidity: <span id="monthlyHumidity"></span>%</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-wind"></i>
-                                <span>Wind: <span id="monthlyWind"></span> m/s</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-cloud-rain"></i>
-                                <span>Total Rainfall: <span id="monthlyRainfall"></span> mm</span>
+                        <!-- Monthly Weather -->
+                        <div class="weather-period">
+                            <h3><i class="fas fa-calendar-alt"></i> Monthly Averages</h3>
+                            <div class="weather-content">
+                                <div class="weather-main">
+                                    <div class="temperature">
+                                        <span id="monthlyTemp" class="temp-value"></span>
+                                        <span class="temp-unit">°C</span>
+                                    </div>
+                                    <div class="weather-description">
+                                        <span id="monthlyWeatherDesc">Monthly Average</span>
+                                    </div>
+                                </div>
+                                <div class="weather-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-thermometer-half"></i>
+                                        <span>Min: <span id="monthlyMin"></span>°C | Max: <span id="monthlyMax"></span>°C</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-tint"></i>
+                                        <span>Humidity: <span id="monthlyHumidity"></span>%</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-wind"></i>
+                                        <span>Wind: <span id="monthlyWind"></span> m/s</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-cloud-rain"></i>
+                                        <span>Total Rainfall: <span id="monthlyRainfall"></span> mm</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -227,37 +269,16 @@
                     <p id="errorMessage"></p>
                 </div>
             </div>
-
-            <!-- Statistics Section -->
-            <section class="stats-section">
-                <div class="stats-container">
-                    <h2><i class="fas fa-chart-bar"></i> Usage Statistics</h2>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div class="stat-number" id="totalSearches">0</div>
-                            <div class="stat-label">Total Searches</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" id="uniqueLocations">0</div>
-                            <div class="stat-label">Locations Checked</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" id="recentSearches">0</div>
-                            <div class="stat-label">Recent Searches</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
         </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="footer-content">
-                <p>&copy; 2025 Weather & Agriculture Insights. Empowering Rwandan Farmers.</p>
-                <p>Powered by OpenWeatherMap API</p>
-            </div>
-        </footer>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Weather & Agriculture Insights. Empowering Rwandan Farmers.</p>
+            <p>Powered by OpenWeatherMap API</p>
+        </div>
+    </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>

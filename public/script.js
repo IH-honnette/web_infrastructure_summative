@@ -9,7 +9,6 @@ const errorMessage = document.getElementById('errorMessage');
 
 // Weather elements - Weekly
 const locationName = document.getElementById('locationName');
-const locationName2 = document.getElementById('locationName2');
 const weeklyTemp = document.getElementById('weeklyTemp');
 const weeklyWeatherDesc = document.getElementById('weeklyWeatherDesc');
 const weeklyMin = document.getElementById('weeklyMin');
@@ -142,9 +141,8 @@ function displayWeather(data) {
     const weekly = data.weekly_averages;
     const monthly = data.monthly_averages;
     
-    // Set location names
+    // Set location name
     locationName.textContent = data.location;
-    locationName2.textContent = data.location;
     
     // Display weekly averages
     if (weekly) {
