@@ -1,509 +1,422 @@
-// Global variables
-let map = null;
-let currentResults = null;
-
-// DOM elements
-const ipInput = document.getElementById('ipInput');
-const checkIpBtn = document.getElementById('checkIpBtn');
-const checkMyIpBtn = document.getElementById('checkMyIpBtn');
-const loadingIndicator = document.getElementById('loadingIndicator');
-const resultsSection = document.getElementById('resultsSection');
-const closeResults = document.getElementById('closeResults');
-const historyFilter = document.getElementById('historyFilter');
-const clearHistory = document.getElementById('clearHistory');
-const historyList = document.getElementById('historyList');
-const errorModal = document.getElementById('errorModal');
+// DOM Elements
+const locationSelect = document.getElementById('locationSelect');
+const cropSelect = document.getElementById('cropSelect');
+const searchBtn = document.getElementById('searchBtn');
+const loading = document.getElementById('loading');
+const results = document.getElementById('results');
+const errorSection = document.getElementById('errorSection');
 const errorMessage = document.getElementById('errorMessage');
 
-// Event listeners
+// Weather elements - Weekly
+const locationName = document.getElementById('locationName');
+const locationName2 = document.getElementById('locationName2');
+const weeklyTemp = document.getElementById('weeklyTemp');
+const weeklyWeatherDesc = document.getElementById('weeklyWeatherDesc');
+const weeklyMin = document.getElementById('weeklyMin');
+const weeklyMax = document.getElementById('weeklyMax');
+const weeklyHumidity = document.getElementById('weeklyHumidity');
+const weeklyWind = document.getElementById('weeklyWind');
+const weeklyPrecip = document.getElementById('weeklyPrecip');
+
+// Weather elements - Monthly
+const monthlyTemp = document.getElementById('monthlyTemp');
+const monthlyWeatherDesc = document.getElementById('monthlyWeatherDesc');
+const monthlyMin = document.getElementById('monthlyMin');
+const monthlyMax = document.getElementById('monthlyMax');
+const monthlyHumidity = document.getElementById('monthlyHumidity');
+const monthlyWind = document.getElementById('monthlyWind');
+const monthlyRainfall = document.getElementById('monthlyRainfall');
+
+// Agriculture elements
+const agricultureCard = document.getElementById('agricultureCard');
+const cropName = document.getElementById('cropName');
+const riskLevel = document.getElementById('riskLevel');
+const plantingAdvice = document.getElementById('plantingAdvice');
+const recommendationsList = document.getElementById('recommendationsList');
+const alertsSection = document.getElementById('alertsSection');
+const alertsList = document.getElementById('alertsList');
+
+// Forecast elements
+const forecastCard = document.getElementById('forecastCard');
+const forecastList = document.getElementById('forecastList');
+
+// Crop info elements
+const cropInfoCard = document.getElementById('cropInfoCard');
+const plantingSeason = document.getElementById('plantingSeason');
+const harvestingSeason = document.getElementById('harvestingSeason');
+const optimalTemp = document.getElementById('optimalTemp');
+const optimalRainfall = document.getElementById('optimalRainfall');
+const droughtTolerance = document.getElementById('droughtTolerance');
+const floodTolerance = document.getElementById('floodTolerance');
+
+// Stats elements
+const totalSearches = document.getElementById('totalSearches');
+const uniqueLocations = document.getElementById('uniqueLocations');
+const recentSearches = document.getElementById('recentSearches');
+
+// Event Listeners
+searchBtn.addEventListener('click', handleSearch);
+locationSelect.addEventListener('change', handleLocationChange);
+cropSelect.addEventListener('change', handleCropChange);
+
+// Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    checkIpBtn.addEventListener('click', checkIpAddress);
-    checkMyIpBtn.addEventListener('click', checkMyIp);
-    closeResults.addEventListener('click', hideResults);
-    historyFilter.addEventListener('change', loadHistory);
-    clearHistory.addEventListener('click', clearHistoryData);
-    ipInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            checkIpAddress();
-        }
-    });
-    
-    // Load initial data
-    loadHistory();
     loadStats();
 });
 
-// API Functions
-async function checkIpAddress() {
-    const ipAddress = ipInput.value.trim();
+// Handle search button click
+async function handleSearch() {
+    const location = locationSelect.value;
+    const crop = cropSelect.value;
     
-    if (!ipAddress) {
-        showError('Please enter an IP address');
+    if (!location) {
+        showError('Please select a location');
         return;
     }
     
-    // Basic IP validation
-    const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-    if (!ipRegex.test(ipAddress)) {
-        showError('Please enter a valid IPv4 address');
-        return;
-    }
-    
-    showLoading(true);
+    showLoading();
+    hideError();
     
     try {
-        const response = await fetch(`/api/ip/${ipAddress}`);
-        const data = await response.json();
+        // Get weather data
+        const weatherResponse = await fetch(`/api/weather/${location}`);
+        const weatherData = await weatherResponse.json();
         
-        if (data.success) {
-            displayResults(data.data);
-            loadHistory();
-            loadStats();
+        if (!weatherData.success) {
+            throw new Error(weatherData.message || 'Failed to fetch weather data');
+        }
+        
+        // Display weather information
+        displayWeather(weatherData);
+        
+        // If crop is selected, get agricultural insights
+        if (crop) {
+            const agricultureResponse = await fetch(`/api/agriculture/${location}/${crop}`);
+            const agricultureData = await agricultureResponse.json();
+            
+            if (agricultureData.success) {
+                displayAgriculture(agricultureData);
+            }
         } else {
-            showError(data.message || 'Failed to fetch IP information');
+            hideAgriculture();
         }
+        
+        // Get forecast data
+        const forecastResponse = await fetch(`/api/forecast/${location}`);
+        const forecastData = await forecastResponse.json();
+        
+        if (forecastData.success) {
+            displayForecast(forecastData);
+        }
+        
+        showResults();
+        loadStats();
+        
     } catch (error) {
-        console.error('Error:', error);
-        showError('Network error. Please try again.');
-    } finally {
-        showLoading(false);
+        console.error('Search error:', error);
+        showError(error.message || 'An error occurred while fetching data');
     }
 }
 
-async function checkMyIp() {
-    showLoading(true);
+// Handle location change
+function handleLocationChange() {
+    const location = locationSelect.value;
+    if (location) {
+        // Clear previous results
+        hideResults();
+        hideError();
+    }
+}
+
+// Handle crop change
+function handleCropChange() {
+    const crop = cropSelect.value;
+    if (crop && locationSelect.value) {
+        // Re-run search with new crop
+        handleSearch();
+    }
+}
+
+// Display weather information
+function displayWeather(data) {
+    const weekly = data.weekly_averages;
+    const monthly = data.monthly_averages;
     
-    try {
-        const response = await fetch('/api/my-ip');
-        const data = await response.json();
-        
-        if (data.success) {
-            ipInput.value = data.clientIP;
-            displayResults(data.data);
-            loadHistory();
-            loadStats();
-        } else {
-            showError(data.message || 'Failed to fetch your IP information');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showError('Network error. Please try again.');
-    } finally {
-        showLoading(false);
+    // Set location names
+    locationName.textContent = data.location;
+    locationName2.textContent = data.location;
+    
+    // Display weekly averages
+    if (weekly) {
+        weeklyTemp.textContent = Math.round(weekly.temp.day);
+        weeklyWeatherDesc.textContent = `Weekly Average - ${weekly.weather_conditions}`;
+        weeklyMin.textContent = Math.round(weekly.temp.min);
+        weeklyMax.textContent = Math.round(weekly.temp.max);
+        weeklyHumidity.textContent = Math.round(weekly.humidity);
+        weeklyWind.textContent = weekly.wind_speed.toFixed(1);
+        weeklyPrecip.textContent = Math.round(weekly.precipitation * 100);
+    }
+    
+    // Display monthly averages
+    if (monthly) {
+        monthlyTemp.textContent = Math.round(monthly.temp.day);
+        monthlyWeatherDesc.textContent = `Monthly Average - ${monthly.weather_conditions}`;
+        monthlyMin.textContent = Math.round(monthly.temp.min);
+        monthlyMax.textContent = Math.round(monthly.temp.max);
+        monthlyHumidity.textContent = Math.round(monthly.humidity);
+        monthlyWind.textContent = monthly.wind_speed.toFixed(1);
+        monthlyRainfall.textContent = Math.round(monthly.total_rainfall);
     }
 }
 
-async function loadHistory() {
-    try {
-        const filter = historyFilter.value;
-        const url = filter ? `/api/history?filter=${filter}` : '/api/history';
-        
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.success) {
-            displayHistory(data.data);
-        }
-    } catch (error) {
-        console.error('Error loading history:', error);
+// Display agricultural insights
+function displayAgriculture(data) {
+    const analysis = data.analysis;
+    const cropInfo = data.crop_info;
+    
+    cropName.textContent = analysis.crop;
+    
+    // Risk level
+    riskLevel.textContent = analysis.risk_level;
+    riskLevel.className = `risk-badge ${analysis.risk_level}`;
+    
+    // Planting advice
+    plantingAdvice.textContent = analysis.planting_advice;
+    
+    // Recommendations
+    recommendationsList.innerHTML = '';
+    analysis.recommendations.forEach(rec => {
+        const li = document.createElement('li');
+        li.textContent = rec;
+        recommendationsList.appendChild(li);
+    });
+    
+    // Alerts
+    if (analysis.alerts && analysis.alerts.length > 0) {
+        alertsList.innerHTML = '';
+        analysis.alerts.forEach(alert => {
+            const li = document.createElement('li');
+            li.textContent = alert;
+            alertsList.appendChild(li);
+        });
+        alertsSection.classList.remove('hidden');
+    } else {
+        alertsSection.classList.add('hidden');
     }
+    
+    // Crop information
+    plantingSeason.textContent = cropInfo.planting_season;
+    harvestingSeason.textContent = cropInfo.harvesting_season;
+    optimalTemp.textContent = `${cropInfo.optimal_temp.min}°C - ${cropInfo.optimal_temp.max}°C`;
+    optimalRainfall.textContent = `${cropInfo.optimal_rainfall.min}mm - ${cropInfo.optimal_rainfall.max}mm`;
+    droughtTolerance.textContent = cropInfo.drought_tolerance;
+    floodTolerance.textContent = cropInfo.flood_tolerance;
+    
+    showAgriculture();
+    showCropInfo();
 }
 
+// Display monthly forecast
+function displayForecast(data) {
+    forecastList.innerHTML = '';
+    
+    if (data.monthly_forecast && data.monthly_forecast.length > 0) {
+        data.monthly_forecast.forEach(week => {
+            const forecastItem = document.createElement('div');
+            forecastItem.className = 'forecast-item';
+            forecastItem.innerHTML = `
+                <div class="forecast-date">Week ${week.week_number}<br>${week.start_date} - ${week.end_date}</div>
+                <div class="forecast-temp">${Math.round(week.averages.temp.day)}°C</div>
+                <div class="forecast-desc">${week.averages.weather_conditions}</div>
+                <div class="forecast-details">
+                    <small>Min: ${Math.round(week.averages.temp.min)}°C | Max: ${Math.round(week.averages.temp.max)}°C</small><br>
+                    <small>Humidity: ${Math.round(week.averages.humidity)}%</small>
+                </div>
+            `;
+            
+            forecastList.appendChild(forecastItem);
+        });
+    }
+    
+    showForecast();
+}
+
+// Show/hide functions
+function showLoading() {
+    loading.classList.remove('hidden');
+    hideResults();
+    hideError();
+}
+
+function hideLoading() {
+    loading.classList.add('hidden');
+}
+
+function showResults() {
+    results.classList.remove('hidden');
+    hideLoading();
+}
+
+function hideResults() {
+    results.classList.add('hidden');
+}
+
+function showAgriculture() {
+    agricultureCard.classList.remove('hidden');
+}
+
+function hideAgriculture() {
+    agricultureCard.classList.add('hidden');
+    cropInfoCard.classList.add('hidden');
+}
+
+function showCropInfo() {
+    cropInfoCard.classList.remove('hidden');
+}
+
+function showForecast() {
+    forecastCard.classList.remove('hidden');
+}
+
+function showError(message) {
+    errorMessage.textContent = message;
+    errorSection.classList.remove('hidden');
+    hideLoading();
+    hideResults();
+}
+
+function hideError() {
+    errorSection.classList.add('hidden');
+}
+
+// Load statistics
 async function loadStats() {
     try {
         const response = await fetch('/api/stats');
         const data = await response.json();
         
         if (data.success) {
-            displayStats(data.data);
+            totalSearches.textContent = data.data.totalSearches;
+            uniqueLocations.textContent = data.data.uniqueLocations;
+            recentSearches.textContent = data.data.recentSearches.length;
         }
     } catch (error) {
-        console.error('Error loading stats:', error);
+        console.error('Failed to load stats:', error);
     }
 }
 
-// Display Functions
-function displayResults(data) {
-    currentResults = data;
-    
-    // Update IP details
-    document.getElementById('ipAddress').textContent = data.ip || '-';
-    document.getElementById('ipType').textContent = data.type || '-';
-    document.getElementById('location').textContent = formatLocation(data);
-    document.getElementById('country').textContent = formatCountry(data);
-    document.getElementById('organization').textContent = formatOrganization(data);
-    document.getElementById('timezone').textContent = formatTimezone(data);
-    document.getElementById('currency').textContent = formatCurrency(data);
-    document.getElementById('continent').textContent = formatContinent(data);
-    
-    // Update security status
-    updateSecurityStatus(data);
-    
-    // Update security analysis
-    updateSecurityAnalysis(data);
-    
-    // Update privacy tips
-    updatePrivacyTips(data);
-    
-    // Initialize map
-    initializeMap(data);
-    
-    // Show results
-    resultsSection.classList.remove('hidden');
-    resultsSection.scrollIntoView({ behavior: 'smooth' });
-}
-
-function updateSecurityStatus(data) {
-    const securityBadge = document.getElementById('securityBadge');
-    const security = data.security || {};
-    let status = 'safe';
-    let text = 'Safe';
-    let icon = 'fas fa-shield-alt';
-    
-    if (security.tor) {
-        status = 'danger';
-        text = 'TOR Network Detected';
-        icon = 'fas fa-user-secret';
-    } else if (security.vpn || security.proxy) {
-        status = 'warning';
-        text = 'VPN/Proxy Detected';
-        icon = 'fas fa-network-wired';
-    }
-    
-    securityBadge.className = `security-badge ${status}`;
-    securityBadge.innerHTML = `<i class="${icon}"></i><span>${text}</span>`;
-}
-
-function updateSecurityAnalysis(data) {
-    const security = data.security || {};
-    
-    // Proxy status
-    updateSecurityItem('proxyStatus', security.proxy, 'Proxy');
-    
-    // VPN status
-    updateSecurityItem('vpnStatus', security.vpn, 'VPN');
-    
-    // TOR status
-    updateSecurityItem('torStatus', security.tor, 'TOR Network');
-    
-    // Hosting status
-    updateSecurityItem('hostingStatus', security.hosting, 'Hosting');
-}
-
-function updateSecurityItem(elementId, isDetected, label) {
-    const element = document.getElementById(elementId);
-    const indicator = element.querySelector('.status-indicator');
-    
-    // Remove existing classes
-    element.classList.remove('safe', 'warning', 'danger');
-    indicator.classList.remove('safe', 'warning', 'danger');
-    
-    if (isDetected) {
-        element.classList.add('danger');
-        indicator.classList.add('danger');
-        element.querySelector('.security-label').textContent = `${label} - Detected`;
-    } else {
-        element.classList.add('safe');
-        indicator.classList.add('safe');
-        element.querySelector('.security-label').textContent = `${label} - Not Detected`;
-    }
-}
-
-function updatePrivacyTips(data) {
-    const tipsContainer = document.getElementById('privacyTips');
-    const security = data.security || {};
-    const tips = [];
-    
-    if (security.tor) {
-        tips.push({
-            icon: 'fas fa-user-secret',
-            text: 'This IP is using the TOR network. While this provides anonymity, it may be flagged by some services.',
-            type: 'warning'
-        });
-    } else if (security.vpn || security.proxy) {
-        tips.push({
-            icon: 'fas fa-network-wired',
-            text: 'This IP appears to be using a VPN or proxy. This can help protect privacy but may affect service access.',
-            type: 'info'
-        });
-    } else {
-        tips.push({
-            icon: 'fas fa-shield-alt',
-            text: 'This appears to be a regular IP address. Consider using a VPN for enhanced privacy.',
-            type: 'safe'
-        });
-    }
-    
-    tips.push({
-        icon: 'fas fa-globe',
-        text: `Your location is visible as ${formatLocation(data)}. Be aware of what information you share online.`,
-        type: 'info'
+// Utility functions
+function formatDate(timestamp) {
+    return new Date(timestamp * 1000).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
     });
-    
-    if (data.connection?.org) {
-        tips.push({
-            icon: 'fas fa-building',
-            text: `Your ISP is ${data.connection.org}. They can see your online activity.`,
-            type: 'info'
-        });
-    }
-    
-    if (security.hosting) {
-        tips.push({
-            icon: 'fas fa-server',
-            text: 'This IP is associated with hosting services. Be extra cautious with sensitive data.',
-            type: 'warning'
-        });
-    }
-    
-    tips.push({
-        icon: 'fas fa-lock',
-        text: 'Use HTTPS websites, enable two-factor authentication, and regularly review your privacy settings.',
-        type: 'safe'
+}
+
+function formatTime(timestamp) {
+    return new Date(timestamp * 1000).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
     });
-    
-    tipsContainer.innerHTML = tips.map(tip => `
-        <div class="tip-item">
-            <i class="${tip.icon}"></i>
-            <span>${tip.text}</span>
-        </div>
-    `).join('');
 }
 
-function initializeMap(data) {
-    if (!data.latitude || !data.longitude) {
-        document.getElementById('map').innerHTML = '<p style="text-align: center; padding: 20px; color: #718096;">Location data not available</p>';
-        return;
-    }
-    
-    // Destroy existing map if it exists
-    if (map) {
-        map.remove();
-    }
-    
-    // Create new map
-    map = L.map('map').setView([data.latitude, data.longitude], 10);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-    
-    // Add marker
-    const marker = L.marker([data.latitude, data.longitude]).addTo(map);
-    
-    // Add popup with location info
-    const popupContent = `
-        <div style="text-align: center;">
-            <strong>${formatLocation(data)}</strong><br>
-            ${data.latitude.toFixed(4)}, ${data.longitude.toFixed(4)}
-        </div>
-    `;
-    marker.bindPopup(popupContent);
-}
-
-function displayHistory(history) {
-    if (history.length === 0) {
-        historyList.innerHTML = '<p style="text-align: center; padding: 20px; color: #718096;">No search history available</p>';
-        return;
-    }
-    
-    historyList.innerHTML = history.map(item => {
-        const security = item.result.security || {};
-        let status = 'safe';
-        let statusText = 'Safe';
-        
-        if (security.tor) {
-            status = 'tor';
-            statusText = 'TOR';
-        } else if (security.vpn || security.proxy) {
-            status = 'proxy';
-            statusText = security.vpn ? 'VPN' : 'Proxy';
+// Add some interactive features
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to forecast items
+    forecastList.addEventListener('mouseover', function(e) {
+        if (e.target.closest('.forecast-item')) {
+            e.target.closest('.forecast-item').style.transform = 'scale(1.05)';
         }
-        
-        const location = formatLocation(item.result);
-        const time = new Date(item.timestamp).toLocaleString();
-        
-        return `
-            <div class="history-item ${status}" onclick="loadHistoryItem('${item.ip}')">
-                <div class="history-info">
-                    <div class="history-ip">${item.ip}</div>
-                    <div class="history-location">${location}</div>
-                    <div class="history-time">${time}</div>
-                </div>
-                <div class="history-status ${status}">${statusText}</div>
-            </div>
-        `;
-    }).join('');
-}
-
-function displayStats(stats) {
-    document.getElementById('totalSearches').textContent = stats.totalSearches;
-    document.getElementById('safeCount').textContent = stats.safeCount;
-    document.getElementById('proxyCount').textContent = stats.proxyCount + stats.vpnCount;
-    document.getElementById('torCount').textContent = stats.torCount;
-}
-
-// Utility Functions
-function formatLocation(data) {
-    const city = data.city;
-    const country = data.country;
+    });
     
-    if (city && country) {
-        return `${city}, ${country}`;
-    } else if (city) {
-        return city;
-    } else if (country) {
-        return country;
-    }
-    return 'Unknown';
-}
-
-function formatCountry(data) {
-    const country = data.country;
-    const flag = data.flag;
+    forecastList.addEventListener('mouseout', function(e) {
+        if (e.target.closest('.forecast-item')) {
+            e.target.closest('.forecast-item').style.transform = 'scale(1)';
+        }
+    });
     
-    if (country && flag?.emoji) {
-        return `${flag.emoji} ${country}`;
-    } else if (country) {
-        return country;
-    }
-    return 'Unknown';
-}
-
-function formatOrganization(data) {
-    const connection = data.connection;
-    if (connection?.org) {
-        return connection.org;
-    }
-    return 'Unknown';
-}
-
-function formatTimezone(data) {
-    const timezone = data.timezone;
-    if (timezone?.id) {
-        return timezone.id;
-    }
-    return 'Unknown';
-}
-
-function formatCurrency(data) {
-    const currency = data.currency;
-    if (currency?.name && currency?.symbol) {
-        return `${currency.symbol} ${currency.name}`;
-    } else if (currency?.name) {
-        return currency.name;
-    }
-    return 'Unknown';
-}
-
-function formatContinent(data) {
-    const continent = data.continent;
-    if (continent) {
-        return continent;
-    }
-    return 'Unknown';
-}
-
-function loadHistoryItem(ip) {
-    ipInput.value = ip;
-    checkIpAddress();
-}
-
-function clearHistoryData() {
-    if (confirm('Are you sure you want to clear all search history?')) {
-        // In a real application, you would call an API to clear history
-        // For now, we'll just reload the page
-        location.reload();
-    }
-}
-
-// Copy to clipboard function
-function copyToClipboard(elementId) {
-    const element = document.getElementById(elementId);
-    const text = element.textContent;
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && document.activeElement === searchBtn) {
+            handleSearch();
+        }
+    });
     
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-            showCopySuccess(elementId);
-        }).catch(() => {
-            fallbackCopyTextToClipboard(text, elementId);
-        });
-    } else {
-        fallbackCopyTextToClipboard(text, elementId);
-    }
-}
-
-function fallbackCopyTextToClipboard(text, elementId) {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    
-    try {
-        document.execCommand('copy');
-        showCopySuccess(elementId);
-    } catch (err) {
-        console.error('Fallback: Oops, unable to copy', err);
-    }
-    
-    document.body.removeChild(textArea);
-}
-
-function showCopySuccess(elementId) {
-    const copyBtn = document.querySelector(`#${elementId}`).nextElementSibling;
-    const originalIcon = copyBtn.innerHTML;
-    
-    copyBtn.innerHTML = '<i class="fas fa-check"></i>';
-    copyBtn.style.color = '#48bb78';
-    
-    setTimeout(() => {
-        copyBtn.innerHTML = originalIcon;
-        copyBtn.style.color = '#718096';
-    }, 2000);
-}
-
-// UI Functions
-function showLoading(show) {
-    if (show) {
-        loadingIndicator.classList.remove('hidden');
-        checkIpBtn.disabled = true;
-        checkMyIpBtn.disabled = true;
-    } else {
-        loadingIndicator.classList.add('hidden');
-        checkIpBtn.disabled = false;
-        checkMyIpBtn.disabled = false;
-    }
-}
-
-function hideResults() {
-    resultsSection.classList.add('hidden');
-    if (map) {
-        map.remove();
-        map = null;
-    }
-}
-
-function showError(message) {
-    errorMessage.textContent = message;
-    errorModal.classList.remove('hidden');
-}
-
-function closeErrorModal() {
-    errorModal.classList.add('hidden');
-}
-
-// Close modal when clicking outside
-errorModal.addEventListener('click', function(e) {
-    if (e.target === errorModal) {
-        closeErrorModal();
-    }
+    // Add smooth scrolling for better UX
+    searchBtn.addEventListener('click', function() {
+        setTimeout(() => {
+            if (!results.classList.contains('hidden')) {
+                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 500);
+    });
 });
 
-// Close results when clicking escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        hideResults();
-        closeErrorModal();
-    }
-}); 
+// Add weather icon mapping
+const weatherIcons = {
+    'clear': '☀️',
+    'clouds': '☁️',
+    'rain': '🌧️',
+    'drizzle': '🌦️',
+    'thunderstorm': '⛈️',
+    'snow': '❄️',
+    'mist': '🌫️',
+    'fog': '🌫️',
+    'haze': '🌫️'
+};
+
+// Function to get weather icon
+function getWeatherIcon(weatherMain) {
+    const main = weatherMain.toLowerCase();
+    return weatherIcons[main] || '🌤️';
+}
+
+// Add color coding for temperature
+function getTemperatureColor(temp) {
+    if (temp < 10) return '#3498db'; // Cold - blue
+    if (temp < 20) return '#f39c12'; // Cool - orange
+    if (temp < 30) return '#e67e22'; // Warm - dark orange
+    return '#e74c3c'; // Hot - red
+}
+
+// Add risk level descriptions
+const riskDescriptions = {
+    'low': 'Good conditions for farming activities',
+    'medium': 'Moderate risk - take precautions',
+    'high': 'High risk - avoid farming activities if possible'
+};
+
+// Function to get risk description
+function getRiskDescription(riskLevel) {
+    return riskDescriptions[riskLevel] || 'Risk level unknown';
+}
+
+// Add crop-specific tips
+const cropTips = {
+    'maize': 'Maize requires well-drained soil and regular rainfall. Plant in rows for better yield.',
+    'beans': 'Beans are nitrogen-fixing crops. Good for crop rotation with maize.',
+    'potatoes': 'Potatoes prefer cool temperatures and well-drained soil. Avoid waterlogging.',
+    'rice': 'Rice requires standing water. Ensure proper irrigation and drainage.',
+    'coffee': 'Coffee prefers shade and moderate temperatures. Plant under trees if possible.',
+    'tea': 'Tea requires acidic soil and regular pruning. Harvest young leaves for best quality.'
+};
+
+// Function to get crop tips
+function getCropTips(crop) {
+    return cropTips[crop.toLowerCase()] || 'General farming practices apply.';
+}
+
+// Export functions for potential future use
+window.WeatherApp = {
+    handleSearch,
+    displayWeather,
+    displayAgriculture,
+    displayForecast,
+    loadStats,
+    getWeatherIcon,
+    getTemperatureColor,
+    getRiskDescription,
+    getCropTips
+}; 

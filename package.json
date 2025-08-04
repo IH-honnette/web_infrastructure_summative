@@ -1,7 +1,7 @@
 {
-  "name": "ip-privacy-checker",
+  "name": "weather-agriculture-insights",
   "version": "1.0.0",
-  "description": "A web application to check IP address privacy and security information",
+  "description": "A web application providing weather forecasts and agricultural insights for Rwandan farmers",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server-simple.js",
@@ -9,12 +9,14 @@
     "build": "echo 'No build step required for this project'"
   },
   "keywords": [
-    "ip",
-    "privacy",
-    "security",
-    "geolocation",
-    "vpn",
-    "proxy"
+    "weather",
+    "agriculture",
+    "farming",
+    "rwanda",
+    "forecast",
+    "crops",
+    "planting",
+    "harvesting"
   ],
   "author": "Your Name",
   "license": "MIT",

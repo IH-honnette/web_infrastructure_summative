@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IP Privacy Checker - Digital Privacy Awareness Tool</title>
+    <title>Weather & Agriculture Insights - Rwanda Farmers</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <meta name="description" content="Check your IP address privacy and security. Detect VPN, proxy, and TOR usage. Understand your digital footprint.">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
     <div class="container">
@@ -15,10 +14,10 @@
         <header class="header">
             <div class="header-content">
                 <div class="logo">
-                    <i class="fas fa-shield-alt"></i>
-                    <h1>IP Privacy Checker</h1>
+                    <i class="fas fa-seedling"></i>
+                    <h1>Weather & Agriculture Insights</h1>
                 </div>
-                <p>Understand your digital footprint and privacy exposure</p>
+                <p class="subtitle">Empowering Rwandan Farmers with Data-Driven Decisions</p>
             </div>
         </header>
 
@@ -26,251 +25,225 @@
         <main class="main-content">
             <!-- Search Section -->
             <section class="search-section">
-                <div class="search-card">
-                    <div class="search-header">
-                        <i class="fas fa-search"></i>
-                        <h2>Check IP Address</h2>
-                    </div>
-                    <div class="search-form">
-                        <div class="input-group">
-                            <input type="text" id="ipInput" placeholder="Enter IP address (e.g., 8.8.8.8)" class="search-input">
-                            <button id="checkIpBtn" class="search-btn">
-                                <i class="fas fa-search"></i> Check
-                            </button>
-                        </div>
-                        <div class="divider">
-                            <span>or</span>
-                        </div>
-                        <button id="checkMyIpBtn" class="my-ip-btn">
-                            <i class="fas fa-user"></i> Check My IP
-                        </button>
-                    </div>
-                    <div id="loadingIndicator" class="loading hidden">
-                        <div class="spinner"></div>
-                        <p>Analyzing IP address...</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Results Section -->
-            <section id="resultsSection" class="results-section hidden">
-                <div class="results-card">
-                    <div class="results-header">
-                        <div class="header-left">
-                            <i class="fas fa-info-circle"></i>
-                            <h2>IP Analysis Results</h2>
-                        </div>
-                        <button id="closeResults" class="close-btn">
-                            <i class="fas fa-times"></i>
-                        </button>
+                <div class="search-container">
+                    <div class="search-group">
+                        <label for="locationSelect">Select Location:</label>
+                        <select id="locationSelect" class="form-control">
+                            <option value="">Choose a city/village...</option>
+                            <option value="kigali">Kigali</option>
+                            <option value="butare">Butare</option>
+                            <option value="gisenyi">Gisenyi</option>
+                            <option value="ruhengeri">Ruhengeri</option>
+                            <option value="kibuye">Kibuye</option>
+                            <option value="kibungo">Kibungo</option>
+                            <option value="nyanza">Nyanza</option>
+                            <option value="cyangugu">Cyangugu</option>
+                            <option value="byumba">Byumba</option>
+                            <option value="kayonza">Kayonza</option>
+                        </select>
                     </div>
                     
-                    <div class="results-content">
-                        <!-- Security Status -->
-                        <div class="security-status">
-                            <div id="securityBadge" class="security-badge">
-                                <i class="fas fa-shield-alt"></i>
-                                <span id="securityText">Analyzing...</span>
+                    <div class="search-group">
+                        <label for="cropSelect">Select Crop (Optional):</label>
+                        <select id="cropSelect" class="form-control">
+                            <option value="">Choose a crop...</option>
+                            <option value="maize">Maize</option>
+                            <option value="beans">Beans</option>
+                            <option value="potatoes">Potatoes</option>
+                            <option value="rice">Rice</option>
+                            <option value="coffee">Coffee</option>
+                            <option value="tea">Tea</option>
+                        </select>
+                    </div>
+                    
+                    <button id="searchBtn" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Get Weather & Farming Insights
+                    </button>
+                </div>
+            </section>
+
+            <!-- Loading Indicator -->
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Fetching weather data and agricultural insights...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results" class="results-section hidden">
+                <!-- Weekly Weather Averages Card -->
+                <div class="weather-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-calendar-week"></i> Weekly Weather Averages</h2>
+                        <span id="locationName" class="location-name"></span>
+                    </div>
+                    <div class="weather-content">
+                        <div class="weather-main">
+                            <div class="temperature">
+                                <span id="weeklyTemp" class="temp-value"></span>
+                                <span class="temp-unit">°C</span>
+                            </div>
+                            <div class="weather-description">
+                                <span id="weeklyWeatherDesc">Weekly Average</span>
                             </div>
                         </div>
-
-                        <!-- IP Details Table -->
-                        <div class="details-section">
-                            <h3><i class="fas fa-table"></i> IP Information</h3>
-                            <div class="table-container">
-                                <table class="info-table">
-                                    <tbody>
-                                        <tr>
-                                            <td class="label"><i class="fas fa-network-wired"></i> IP Address</td>
-                                            <td class="value" id="ipAddress">-</td>
-                                            <td class="copy-btn" onclick="copyToClipboard('ipAddress')">
-                                                <i class="fas fa-copy"></i>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label"><i class="fas fa-globe"></i> Type</td>
-                                            <td class="value" id="ipType">-</td>
-                                            <td class="copy-btn" onclick="copyToClipboard('ipType')">
-                                                <i class="fas fa-copy"></i>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label"><i class="fas fa-map-marker-alt"></i> Location</td>
-                                            <td class="value" id="location">-</td>
-                                            <td class="copy-btn" onclick="copyToClipboard('location')">
-                                                <i class="fas fa-copy"></i>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label"><i class="fas fa-flag"></i> Country</td>
-                                            <td class="value" id="country">-</td>
-                                            <td class="copy-btn" onclick="copyToClipboard('country')">
-                                                <i class="fas fa-copy"></i>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label"><i class="fas fa-building"></i> ISP/Organization</td>
-                                            <td class="value" id="organization">-</td>
-                                            <td class="copy-btn" onclick="copyToClipboard('organization')">
-                                                <i class="fas fa-copy"></i>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label"><i class="fas fa-clock"></i> Timezone</td>
-                                            <td class="value" id="timezone">-</td>
-                                            <td class="copy-btn" onclick="copyToClipboard('timezone')">
-                                                <i class="fas fa-copy"></i>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label"><i class="fas fa-coins"></i> Currency</td>
-                                            <td class="value" id="currency">-</td>
-                                            <td class="copy-btn" onclick="copyToClipboard('currency')">
-                                                <i class="fas fa-copy"></i>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label"><i class="fas fa-map"></i> Continent</td>
-                                            <td class="value" id="continent">-</td>
-                                            <td class="copy-btn" onclick="copyToClipboard('continent')">
-                                                <i class="fas fa-copy"></i>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        <div class="weather-details">
+                            <div class="detail-item">
+                                <i class="fas fa-thermometer-half"></i>
+                                <span>Min: <span id="weeklyMin"></span>°C | Max: <span id="weeklyMax"></span>°C</span>
                             </div>
-                        </div>
-
-                        <!-- Security Analysis -->
-                        <div class="security-analysis">
-                            <h3><i class="fas fa-lock"></i> Security Analysis</h3>
-                            <div class="security-grid">
-                                <div class="security-item" id="proxyStatus">
-                                    <div class="security-icon">
-                                        <i class="fas fa-network-wired"></i>
-                                    </div>
-                                    <div class="security-info">
-                                        <span class="security-label">Proxy</span>
-                                        <div class="status-indicator"></div>
-                                    </div>
-                                </div>
-                                <div class="security-item" id="vpnStatus">
-                                    <div class="security-icon">
-                                        <i class="fas fa-shield-virus"></i>
-                                    </div>
-                                    <div class="security-info">
-                                        <span class="security-label">VPN</span>
-                                        <div class="status-indicator"></div>
-                                    </div>
-                                </div>
-                                <div class="security-item" id="torStatus">
-                                    <div class="security-icon">
-                                        <i class="fas fa-user-secret"></i>
-                                    </div>
-                                    <div class="security-info">
-                                        <span class="security-label">TOR Network</span>
-                                        <div class="status-indicator"></div>
-                                    </div>
-                                </div>
-                                <div class="security-item" id="hostingStatus">
-                                    <div class="security-icon">
-                                        <i class="fas fa-server"></i>
-                                    </div>
-                                    <div class="security-info">
-                                        <span class="security-label">Hosting</span>
-                                        <div class="status-indicator"></div>
-                                    </div>
-                                </div>
+                            <div class="detail-item">
+                                <i class="fas fa-tint"></i>
+                                <span>Humidity: <span id="weeklyHumidity"></span>%</span>
                             </div>
-                        </div>
-
-                        <!-- Map -->
-                        <div class="map-container">
-                            <h3><i class="fas fa-map-marker-alt"></i> Location Map</h3>
-                            <div id="map" class="map"></div>
-                        </div>
-
-                        <!-- Privacy Tips -->
-                        <div class="privacy-tips">
-                            <h3><i class="fas fa-lightbulb"></i> Privacy Tips</h3>
-                            <div id="privacyTips" class="tips-content">
-                                <!-- Tips will be populated dynamically -->
+                            <div class="detail-item">
+                                <i class="fas fa-wind"></i>
+                                <span>Wind: <span id="weeklyWind"></span> m/s</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-cloud-rain"></i>
+                                <span>Precipitation: <span id="weeklyPrecip"></span>%</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
 
-            <!-- History Section -->
-            <section class="history-section">
-                <div class="history-card">
-                    <div class="history-header">
-                        <div class="header-left">
-                            <i class="fas fa-history"></i>
-                            <h2>Search History</h2>
-                        </div>
-                        <div class="history-controls">
-                            <select id="historyFilter" class="filter-select">
-                                <option value="">All Searches</option>
-                                <option value="safe">Safe IPs</option>
-                                <option value="proxy">Proxy</option>
-                                <option value="vpn">VPN</option>
-                                <option value="tor">TOR Network</option>
-                            </select>
-                            <button id="clearHistory" class="clear-btn">
-                                <i class="fas fa-trash"></i> Clear
-                            </button>
-                        </div>
+                <!-- Monthly Weather Averages Card -->
+                <div class="weather-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-calendar-alt"></i> Monthly Weather Averages</h2>
+                        <span id="locationName2" class="location-name"></span>
                     </div>
-                    <div id="historyList" class="history-list">
-                        <!-- History items will be populated dynamically -->
+                    <div class="weather-content">
+                        <div class="weather-main">
+                            <div class="temperature">
+                                <span id="monthlyTemp" class="temp-value"></span>
+                                <span class="temp-unit">°C</span>
+                            </div>
+                            <div class="weather-description">
+                                <span id="monthlyWeatherDesc">Monthly Average</span>
+                            </div>
+                        </div>
+                        <div class="weather-details">
+                            <div class="detail-item">
+                                <i class="fas fa-thermometer-half"></i>
+                                <span>Min: <span id="monthlyMin"></span>°C | Max: <span id="monthlyMax"></span>°C</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-tint"></i>
+                                <span>Humidity: <span id="monthlyHumidity"></span>%</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-wind"></i>
+                                <span>Wind: <span id="monthlyWind"></span> m/s</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-cloud-rain"></i>
+                                <span>Total Rainfall: <span id="monthlyRainfall"></span> mm</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </section>
+
+                <!-- Agricultural Insights Card -->
+                <div id="agricultureCard" class="agriculture-card hidden">
+                    <div class="card-header">
+                        <h2><i class="fas fa-leaf"></i> Agricultural Insights</h2>
+                        <span id="cropName" class="crop-name"></span>
+                    </div>
+                    <div class="agriculture-content">
+                        <div class="risk-level">
+                            <span class="risk-label">Risk Level:</span>
+                            <span id="riskLevel" class="risk-badge"></span>
+                        </div>
+                        
+                        <div class="planting-advice">
+                            <h3><i class="fas fa-seedling"></i> Monthly Planting Advice</h3>
+                            <p id="plantingAdvice"></p>
+                        </div>
+                        
+                        <div class="recommendations">
+                            <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                            <ul id="recommendationsList"></ul>
+                        </div>
+                        
+                        <div id="alertsSection" class="alerts-section hidden">
+                            <h3><i class="fas fa-exclamation-triangle"></i> Alerts</h3>
+                            <ul id="alertsList"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Forecast Card -->
+                <div id="forecastCard" class="forecast-card hidden">
+                    <div class="card-header">
+                        <h2><i class="fas fa-calendar-alt"></i> Monthly Forecast (Weekly Breakdown)</h2>
+                    </div>
+                    <div class="forecast-content">
+                        <div id="forecastList" class="forecast-list"></div>
+                    </div>
+                </div>
+
+                <!-- Crop Information Card -->
+                <div id="cropInfoCard" class="crop-info-card hidden">
+                    <div class="card-header">
+                        <h2><i class="fas fa-info-circle"></i> Crop Information</h2>
+                    </div>
+                    <div class="crop-info-content">
+                        <div class="crop-details">
+                            <div class="detail-row">
+                                <span class="label">Planting Season:</span>
+                                <span id="plantingSeason"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Harvesting Season:</span>
+                                <span id="harvestingSeason"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Optimal Temperature:</span>
+                                <span id="optimalTemp"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Optimal Rainfall:</span>
+                                <span id="optimalRainfall"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Drought Tolerance:</span>
+                                <span id="droughtTolerance"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Flood Tolerance:</span>
+                                <span id="floodTolerance"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Section -->
+            <div id="errorSection" class="error-section hidden">
+                <div class="error-content">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>Error</h3>
+                    <p id="errorMessage"></p>
+                </div>
+            </div>
 
             <!-- Statistics Section -->
             <section class="stats-section">
-                <div class="stats-card">
-                    <div class="stats-header">
-                        <i class="fas fa-chart-bar"></i>
-                        <h2>Statistics</h2>
-                    </div>
+                <div class="stats-container">
+                    <h2><i class="fas fa-chart-bar"></i> Usage Statistics</h2>
                     <div class="stats-grid">
                         <div class="stat-item">
-                            <div class="stat-icon">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="totalSearches">0</div>
-                                <div class="stat-label">Total Searches</div>
-                            </div>
+                            <div class="stat-number" id="totalSearches">0</div>
+                            <div class="stat-label">Total Searches</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-icon safe">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="safeCount">0</div>
-                                <div class="stat-label">Safe IPs</div>
-                            </div>
+                            <div class="stat-number" id="uniqueLocations">0</div>
+                            <div class="stat-label">Locations Checked</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-icon warning">
-                                <i class="fas fa-network-wired"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="proxyCount">0</div>
-                                <div class="stat-label">Proxy/VPN</div>
-                            </div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-icon danger">
-                                <i class="fas fa-user-secret"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="torCount">0</div>
-                                <div class="stat-label">TOR Network</div>
-                            </div>
+                            <div class="stat-number" id="recentSearches">0</div>
+                            <div class="stat-label">Recent Searches</div>
                         </div>
                     </div>
                 </div>
@@ -280,28 +253,10 @@
         <!-- Footer -->
         <footer class="footer">
             <div class="footer-content">
-                <p>&copy; 2024 IP Privacy Checker. Built for digital privacy awareness.</p>
-                <p>Powered by <a href="https://ipwho.is" target="_blank">ipwho.is</a> and <a href="https://ipify.org" target="_blank">ipify.org</a></p>
+                <p>&copy; 2025 Weather & Agriculture Insights. Empowering Rwandan Farmers.</p>
+                <p>Powered by OpenWeatherMap API</p>
             </div>
         </footer>
-    </div>
-
-    <!-- Error Modal -->
-    <div id="errorModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-exclamation-triangle"></i> Error</h3>
-                <button class="close-btn" onclick="closeErrorModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p id="errorMessage">An error occurred.</p>
-            </div>
-            <div class="modal-footer">
-                <button onclick="closeErrorModal()" class="btn-primary">OK</button>
-            </div>
-        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
