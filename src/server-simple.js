@@ -16,7 +16,7 @@ const RWANDA_LOCATIONS = {
   'kigali': { lat: -1.9441, lon: 30.0619, name: 'Kigali' },
   'butare': { lat: -2.5967, lon: 29.7394, name: 'Butare' },
   'gisenyi': { lat: -1.7028, lon: 29.2564, name: 'Gisenyi' },
-  'ruhengeri': { lat: -1.4997, lon: 29.6344, name: 'Musanze' },
+  'musanze': { lat: -1.4997, lon: 29.6344, name: 'Musanze' },
   'kibuye': { lat: -2.0603, lon: 29.3478, name: 'Kibuye' },
   'kibungo': { lat: -2.1597, lon: 30.5419, name: 'Kibungo' },
   'nyanza': { lat: -2.3516, lon: 29.7414, name: 'Nyanza' },

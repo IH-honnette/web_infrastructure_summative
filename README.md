@@ -64,7 +64,7 @@ The application will be available at `http://localhost:8080`
 
 ## 🎥 Demo
 
-**Demo Video**: [Watch the 2-minute demo here](https://your-demo-video-link.com)
+**Demo Video**: [Watch the 2-minute demo here](https://www.youtube.com/)
 
 The demo showcases:
 - Local application setup and running
@@ -168,7 +168,7 @@ Get application usage statistics.
 - **Kigali** - Capital city
 - **Butare** - Southern Rwanda
 - **Gisenyi** - Western Rwanda (Lake Kivu)
-- **Ruhengeri** - Northern Rwanda
+- **Musanze** - Northern Rwanda
 - **Kibuye** - Western Rwanda
 - **Kibungo** - Eastern Rwanda
 - **Nyanza** - Southern Rwanda
