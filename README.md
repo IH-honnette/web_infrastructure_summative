@@ -4,18 +4,17 @@ A modern web application that empowers Rwandan farmers with data-driven weather 
 
 ## 🎥 Demo
 Application live at [Farm Insights](https://web-infrastructure-summative.onrender.com/)
+
 Demo Video: [Watch the 2-minute demo here](https://www.youtube.com/)
 
 ## 🌟 Features
 
-- **Real-time Weather Data**: Current weather conditions for major Rwandan cities and villages
-- **7-Day Weather Forecast**: Extended weather predictions for planning
+- **Real-time Weather Data**: Current weather conditions for major Rwandan cities 
+- **Weather Forecast**: Extended weather predictions for planning
 - **Crop-Specific Analysis**: Tailored recommendations for 6 major crops (Maize, Beans, Potatoes, Rice, Coffee, Tea)
 - **Agricultural Insights**: Planting advice, risk assessments, and farming recommendations
 - **Interactive Dashboard**: Modern, responsive design with sidebar navigation
-- **Location-Based Data**: Weather information for 10 major Rwandan locations
 - **Risk Assessment**: Color-coded risk levels (Low, Medium, High) for farming activities
-- **Usage Statistics**: Track application usage and popular locations
 
 ## 🛠️ Technology Stack
 
@@ -46,11 +45,10 @@ npm install
 ### 3. Environment Configuration
 Create a `.env` file in the root directory:
 ```bash
-# Copy the example file
-cp config.env.example .env
 
 # Edit the file and add your OpenWeatherMap API key
-OPENWEATHER_API_KEY=your_openweathermap_api_key_here
+OPENWEATHER_API_KEY= your_openweathermap_api_key_here
+OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/3.0'
 PORT=8080
 ```
 
@@ -66,15 +64,6 @@ npm start
 
 The application will be available at `http://localhost:8080`
 
-
-
-The demo showcases:
-- Local application setup and running
-- User interaction with location and crop selection
-- Weather data display and agricultural insights
-- Dashboard navigation and responsive design
-- Key features and functionality
-
 ## 📊 API Endpoints
 
 ### GET `/api/weather/:location`
@@ -87,14 +76,33 @@ Get current weather data for a specific location.
 ```json
 {
   "success": true,
-  "location": "Kigali",
-  "coordinates": { "lat": -1.9441, "lon": 30.0619 },
-  "current_weather": {
-    "temp": 23.78,
-    "feels_like": 22.97,
-    "humidity": 29,
-    "wind_speed": 3.09,
-    "weather": [{"description": "few clouds"}]
+  "location": "Musanze",
+  "coordinates": {
+    "lat": -1.4997,
+    "lon": 29.6344
+  },
+  "weekly_averages": {
+    "temp": {
+      "day": 23.637142857142855,
+      "min": 14.609999999999998,
+      "max": 23.965714285714284
+    },
+    "humidity": 39.285714285714285,
+    "wind_speed": 2.5385714285714287,
+    "precipitation": 0.20714285714285713,
+    "weather_conditions": "Clouds"
+  },
+  "monthly_averages": {
+    "temp": {
+      "day": 23.564999999999998,
+      "min": 14.532499999999997,
+      "max": 23.8525
+    },
+    "humidity": 39.375,
+    "wind_speed": 2.5875,
+    "precipitation": 0.18375,
+    "total_rainfall": 0.77,
+    "weather_conditions": "Clouds"
   },
   "timezone": "Africa/Kigali"
 }
@@ -114,31 +122,42 @@ Get agricultural insights for a specific crop and location.
 ```json
 {
   "success": true,
-  "location": "Kigali",
-  "crop": "maize",
-  "analysis": {
-    "crop": "Maize",
-    "current_conditions": {
-      "temperature": 23.78,
-      "humidity": 29,
-      "weather": "few clouds",
-      "temp_status": "optimal"
+  "location": "Musanze",
+  "monthly_forecast": [
+    {
+      "week_number": 1,
+      "start_date": "Aug 6",
+      "end_date": "Aug 12",
+      "averages": {
+        "temp": {
+          "day": 23.637142857142855,
+          "min": 14.609999999999998,
+          "max": 23.965714285714284
+        },
+        "humidity": 39.285714285714285,
+        "wind_speed": 2.5385714285714287,
+        "precipitation": 0.20714285714285713,
+        "weather_conditions": "Clouds"
+      }
     },
-    "recommendations": [
-      "Excellent conditions for planting. Proceed with planting activities."
-    ],
-    "alerts": [],
-    "planting_advice": "Excellent conditions for planting. Proceed with planting activities.",
-    "risk_level": "low"
-  },
-  "crop_info": {
-    "name": "Maize",
-    "planting_season": "March-April, September-October",
-    "harvesting_season": "July-August, January-February",
-    "optimal_temp": {"min": 18, "max": 32},
-    "drought_tolerance": "moderate",
-    "flood_tolerance": "low"
-  }
+    {
+      "week_number": 2,
+      "start_date": "Aug 13",
+      "end_date": "Aug 13",
+      "averages": {
+        "temp": {
+          "day": 23.06,
+          "min": 13.99,
+          "max": 23.06
+        },
+        "humidity": 40,
+        "wind_speed": 2.93,
+        "precipitation": 0.02,
+        "weather_conditions": "Clouds"
+      }
+    }
+  ],
+  "timezone": "Africa/Kigali"
 }
 ```
 
@@ -178,15 +197,6 @@ Get application usage statistics.
 - **Byumba** - Northern Rwanda
 - **Kayonza** - Eastern Rwanda
 
-## 🔧 Configuration
-
-### Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `OPENWEATHER_API_KEY` | Your OpenWeatherMap API key | Required |
-| `PORT` | Server port | 8080 |
-
 ### Security Features
 
 - **Helmet.js**: Security headers
@@ -195,40 +205,10 @@ Get application usage statistics.
 - **Error Handling**: Comprehensive error management
 - **Rate Limiting**: API request throttling
 
-## 🧪 Testing
-
-### Manual Testing
-1. **Weather Check**: Select a location and verify current weather data
-2. **Crop Analysis**: Select a crop and verify agricultural insights
-3. **Forecast**: Check 7-day weather forecast
-4. **Dashboard Navigation**: Test sidebar navigation and responsive design
-
 ### Health Check
 ```bash
 curl http://localhost:8080/api/stats
 ```
-
-## 📈 Performance Optimization
-
-- **Caching**: API responses cached in memory
-- **Compression**: Gzip compression enabled
-- **CDN**: Static assets served efficiently
-- **Database**: In-memory storage for development (use Redis/PostgreSQL for production)
-
-## 🔒 Security Considerations
-
-### API Key Management
-- Never commit API keys to version control
-- Use environment variables for sensitive data
-- Rotate API keys regularly
-- Monitor API usage and rate limits
-
-### Production Hardening
-- Use HTTPS in production
-- Implement proper logging
-- Set up monitoring and alerting
-- Regular security updates
-- Database security (if using persistent storage)
 
 ## 🐛 Troubleshooting
 
@@ -269,32 +249,6 @@ echo $OPENWEATHER_API_KEY
 - **Rate Limits**: 1000 calls/day (free tier)
 - **Features**: Current weather, 7-day forecast, minutely precipitation
 
-## 🚧 Development Challenges & Solutions
-
-### Challenges Encountered:
-
-1. **API Rate Limiting**
-   - **Challenge**: OpenWeatherMap free tier has 1000 calls/day limit
-   - **Solution**: Implemented caching to reduce API calls and added usage monitoring
-
-2. **Responsive Design**
-   - **Challenge**: Creating a dashboard that works on all devices
-   - **Solution**: Used CSS Grid and Flexbox with mobile-first approach
-
-3. **Data Presentation**
-   - **Challenge**: Making weather data meaningful for farmers
-   - **Solution**: Created crop-specific analysis with actionable recommendations
-
-4. **Error Handling**
-   - **Challenge**: Graceful handling of API failures
-   - **Solution**: Comprehensive error handling with user-friendly messages
-
-### Technical Solutions:
-
-- **Caching Strategy**: Implemented in-memory caching for API responses
-- **Progressive Enhancement**: Core functionality works without JavaScript
-- **Accessibility**: Added proper ARIA labels and keyboard navigation
-- **Performance**: Optimized bundle size and loading times
 
 ## 🤝 Contributing
 
