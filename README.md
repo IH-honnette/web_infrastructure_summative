@@ -2,8 +2,9 @@
 
 A modern web application that empowers Rwandan farmers with data-driven weather forecasts and agricultural insights. The application provides real-time weather data, crop-specific recommendations, and planting/harvesting advice to help farmers make informed decisions and improve crop yields.
 
-## Demo
-Application live [Farm Insights](https://web-infrastructure-summative.onrender.com/)
+## 🎥 Demo
+Application live at [Farm Insights](https://web-infrastructure-summative.onrender.com/)
+**Demo Video**: [Watch the 2-minute demo here](https://www.youtube.com/)
 
 ## 🌟 Features
 
@@ -65,9 +66,7 @@ npm start
 
 The application will be available at `http://localhost:8080`
 
-## 🎥 Demo
 
-**Demo Video**: [Watch the 2-minute demo here](https://www.youtube.com/)
 
 The demo showcases:
 - Local application setup and running
