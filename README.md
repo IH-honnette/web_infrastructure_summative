@@ -4,7 +4,7 @@ A modern web application that empowers Rwandan farmers with data-driven weather 
 
 ## 🎥 Demo
 Application live at [Farm Insights](https://web-infrastructure-summative.onrender.com/)
-**Demo Video**: [Watch the 2-minute demo here](https://www.youtube.com/)
+Demo Video: [Watch the 2-minute demo here](https://www.youtube.com/)
 
 ## 🌟 Features
 
