@@ -2,6 +2,9 @@
 
 A modern web application that empowers Rwandan farmers with data-driven weather forecasts and agricultural insights. The application provides real-time weather data, crop-specific recommendations, and planting/harvesting advice to help farmers make informed decisions and improve crop yields.
 
+## Demo
+Application live [Farm Insights](https://web-infrastructure-summative.onrender.com/)
+
 ## 🌟 Features
 
 - **Real-time Weather Data**: Current weather conditions for major Rwandan cities and villages
