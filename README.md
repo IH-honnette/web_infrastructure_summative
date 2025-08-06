@@ -119,45 +119,65 @@ Get agricultural insights for a specific crop and location.
 - `crop` (path): Crop type (maize, beans, potatoes, rice, coffee, tea)
 
 **Response:**
-```json
-{
+```json{
   "success": true,
-  "location": "Musanze",
-  "monthly_forecast": [
-    {
-      "week_number": 1,
-      "start_date": "Aug 6",
-      "end_date": "Aug 12",
-      "averages": {
-        "temp": {
-          "day": 23.637142857142855,
-          "min": 14.609999999999998,
-          "max": 23.965714285714284
-        },
-        "humidity": 39.285714285714285,
-        "wind_speed": 2.5385714285714287,
-        "precipitation": 0.20714285714285713,
-        "weather_conditions": "Clouds"
-      }
+  "location": "Kigali",
+  "crop": "maize",
+  "analysis": {
+    "crop": "Maize",
+    "weekly_averages": {
+      "temp": {
+        "day": 28.012857142857143,
+        "min": 15.695714285714285,
+        "max": 28.557142857142857
+      },
+      "humidity": 29.142857142857142,
+      "wind_speed": 3.025714285714286,
+      "precipitation": 0.038571428571428576,
+      "weather_conditions": "Clouds"
     },
-    {
-      "week_number": 2,
-      "start_date": "Aug 13",
-      "end_date": "Aug 13",
-      "averages": {
-        "temp": {
-          "day": 23.06,
-          "min": 13.99,
-          "max": 23.06
-        },
-        "humidity": 40,
-        "wind_speed": 2.93,
-        "precipitation": 0.02,
-        "weather_conditions": "Clouds"
-      }
-    }
-  ],
-  "timezone": "Africa/Kigali"
+    "monthly_averages": {
+      "temp": {
+        "day": 27.9,
+        "min": 15.642499999999998,
+        "max": 28.53375
+      },
+      "humidity": 29.5,
+      "wind_speed": 2.98625,
+      "precipitation": 0.03375,
+      "total_rainfall": 0,
+      "weather_conditions": "Clouds"
+    },
+    "analysis": {
+      "temperature_status": "optimal",
+      "rainfall_status": "insufficient",
+      "humidity_status": "low"
+    },
+    "recommendations": [
+      "Prepare irrigation systems. Consider drought-resistant crop varieties.",
+      "Low humidity expected - increase irrigation frequency."
+    ],
+    "alerts": [
+      "Low rainfall alert"
+    ],
+    "planting_advice": "Insufficient rainfall expected. Ensure irrigation systems are ready before planting.",
+    "risk_level": "medium"
+  },
+  "crop_info": {
+    "name": "Maize",
+    "planting_season": "March-April, September-October",
+    "harvesting_season": "July-August, January-February",
+    "optimal_temp": {
+      "min": 18,
+      "max": 32
+    },
+    "optimal_rainfall": {
+      "min": 500,
+      "max": 1200
+    },
+    "drought_tolerance": "moderate",
+    "flood_tolerance": "low"
+  }
 }
 ```
 
